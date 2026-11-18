@@ -1,0 +1,39 @@
+/* ============================================================================
+   Besoins 2030 — règles de MISE EN PAGE propres à l'écran.
+   Aucune couleur et aucune valeur hors échelle : les blocs, les jetons et les
+   états viennent du kit (assets/style.css).
+   Tout est préfixé par `.p-besoins` : rien ne fuit sur une autre page.
+   ============================================================================ */
+
+/* --- Les 5 filtres sur UNE seule rangée -----------------------------------
+   `minmax(0, 1.8fr) repeat(4, minmax(0, 1fr))` au-dessus de 1180 px — mesuré
+   à 1366 px, le champ « Scénario » fait 331 px et les quatre autres 184 px,
+   largeur de texte utile = largeur − 48 px. Une grille (plutôt que le flex du
+   kit) garantit des colonnes égales et un retour à la ligne net, quelle que
+   soit la longueur du libellé choisi. Le sélecteur de scénario porte les
+   libellés les plus longs : il reçoit la colonne large et remplit sa cellule
+   (la largeur maximale en flex du kit n'a pas d'objet dans une grille). */
+.p-besoins .filtres { display: grid; grid-template-columns: minmax(0, 1.8fr) repeat(4, minmax(0, 1fr));
+  gap: 8px; }
+.p-besoins .filtres .filtre-large { grid-column: auto; max-width: none; }
+
+/* --- Rangée « graphique + carte » -----------------------------------------
+   Les deux panneaux de cette rangée ont la même hauteur : le graphique des
+   scénarios occupe la place laissée par la carte (zone `.zone-graphique` du
+   kit), au lieu de laisser un vide sous le panneau de gauche. La rangée des
+   tableaux, elle, garde l'alignement en haut du kit. */
+.p-besoins #bes-rangee-figures { align-items: stretch; }
+
+/* --- Sous 1181 px : la rangée unique n'est plus tenable ------------------
+   La colonne large tomberait sous 300 px et « Retour au taux d'avant-crise
+   (S2, central) » serait coupé : trois colonnes, puis deux, puis une. */
+@media (max-width: 1180px) {
+  .p-besoins .filtres { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 960px) {
+  .p-besoins .filtres { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .p-besoins .filtres { grid-template-columns: minmax(0, 1fr); }
+  .p-besoins .filtres .filtre-large { grid-column: auto; }
+}

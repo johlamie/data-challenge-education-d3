@@ -1,0 +1,32 @@
+/* Mise en page de « À propos et méthode » — seul écran de texte du site.
+   Les blocs de texte eux-mêmes (`texte()`, `liste()`, `note_limite()`), leur mesure de ligne et
+   leur rythme vertical viennent du kit (assets/style.css § 11) ; il ne reste ici que le sommaire
+   et le repli des colonnes, posés sur le préfixe de page `.p-methode`. Aucune couleur en dur. */
+
+/* Sommaire : liens d'ancre du kit (.lien-suite), une section par ligne. */
+.p-methode .sommaire { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+
+/* Une section visée par une ancre ne colle pas au bord haut de la fenêtre. */
+.p-methode .panneau { scroll-margin-top: 16px; }
+
+/* Texte venant des données : un mot très long casse plutôt que de pousser le tableau,
+   mais un nombre (.c-num, en white-space: nowrap) n'est jamais coupé. */
+.p-methode .tab td { overflow-wrap: break-word; }
+
+/* Seconde ligne d'une cellule (commentaire d'une hypothèse, détail d'un contrôle non conforme) :
+   la note du kit, posée sous le libellé plutôt que dans une colonne de plus — à 475 px, une
+   troisième colonne ferait défiler le tableau (`.table-defile`). Aucune couleur ici : `.note`
+   porte déjà la taille et la couleur atténuée du kit. */
+.p-methode .tab td .note { display: block; margin-top: 4px; }
+
+/* Les tableaux de cette page tiennent dans la largeur qu'on leur donne, en repliant leurs cellules
+   plutôt qu'en défilant : aucune colonne n'est cachée. Le `min-width: 480px` du kit faisait défiler
+   les deux tableaux de la colonne de droite (mesuré 480 pour 440 px utiles à 1366, 471 à 1440) alors
+   qu'ils n'ont que deux colonnes. `.table-defile` reste le filet de sécurité quand la largeur
+   minimale du contenu dépasse malgré tout le bloc (mesuré 353 pour 332 px sur les normes à 390 px). */
+.p-methode .table-defile .tab { min-width: 0; }
+
+/* Page qui défile : deux colonnes 7/5 au-dessus de 1180 px, une seule en dessous. */
+@media (max-width: 1180px) {
+  .p-methode .grille-fiche { grid-template-columns: minmax(0, 1fr); }
+}

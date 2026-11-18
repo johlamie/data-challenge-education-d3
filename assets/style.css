@@ -1,0 +1,853 @@
+/* Feuille de style unique du tableau de bord — écrite sur les classes du kit (d3dash/composants.py)
+   et sur les jetons de assets/tokens.css (aucune couleur en dur ici, var(--…) uniquement).
+   Ordre des sections : socle, bandeaux, coque, chiffres, infobulles, tableaux, carte, contrôles,
+   blocs, états, fiche, composants Dash, connexion, points de rupture. */
+
+/* ============================ 1. Socle ============================ */
+/* Le kit n'emprunte rien à une feuille tierce : les quelques remises à zéro dont il a besoin
+   (qu'un « reboot » comme celui de Bootstrap apporterait au prix de 233 Ko chargés pour une
+   poignée de règles) sont écrites ici, sur les jetons du projet. Rien de décoratif : uniquement
+   ce que le rendu des pages suppose. */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--background); color: var(--foreground);
+  font-family: var(--police-ui); font-size: var(--t-corps); line-height: 1.45;
+  -webkit-tap-highlight-color: transparent; }
+h1, h2, h3, h4, h5, h6 { margin: 0; font-weight: 600; line-height: 1.2; }
+p { margin: 0; }
+/* une liste du corps de texte garde son interligne de bloc (8 px de rythme entre deux blocs) */
+ul, ol { margin-top: 0; margin-bottom: 16px; }
+a { color: inherit; }
+/* un contrôle hérite de la typographie de la page (les navigateurs lui imposent la leur) */
+button, input, select, textarea { font: inherit; margin: 0; }
+select:disabled { opacity: 1; }
+img, svg { vertical-align: middle; }
+fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+/* `<legend>` est flottant et pleine largeur dans certains socles : ici c'est un simple libellé */
+legend { float: none; width: auto; padding: 0; margin: 0; font-size: inherit; line-height: inherit; }
+table { border-collapse: collapse; width: 100%; }
+caption { padding: 0; text-align: left; }
+dl, dd, dt { margin: 0; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+/* « Aller au contenu » : premier élément focalisable, invisible tant qu'on ne l'atteint pas au
+   clavier. Il saute le rail et, sur le Classement, ses dizaines de liens de province. */
+.lien-evitement { position: absolute; left: -9999px; top: 0; z-index: 70;
+  background: var(--card); color: var(--foreground); border: 1px solid var(--primary);
+  border-radius: var(--radius-sm); padding: 8px 16px; font-size: var(--t-petit);
+  font-weight: 600; text-decoration: none; }
+.lien-evitement:focus { left: 8px; top: 8px; }
+/* cible du lien d'évitement : le focus s'y pose sans anneau (il n'est pas un contrôle) */
+#page:focus { outline: none; }
+*:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px;
+  border-radius: var(--radius-xs); }
+.rail .nav-item:focus-visible, .choix-segment .opt input:focus-visible + .opt-txt { outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ============================ 2. Bandeaux ============================ */
+/* Densité des bandeaux : 4 px de remplissage vertical, 26 px rendus. Le texte, le
+   rouge, `role="alert"` et `role="note"` ne changent pas — l'avertissement n'est jamais adouci. */
+.bandeau-demo { background: var(--destructive); color: var(--destructive-foreground);
+  font-size: var(--t-petit); line-height: 1.35; padding: 4px 16px; text-align: center; }
+.bandeau-demo b, .bandeau-demo strong { font-weight: 700; }
+/* le nom d'équipe reste d'un bloc tant qu'il tient (195 px mesurés à 390 px), et coupe le mot en
+   dernier recours plutôt que de déborder du bandeau */
+.bandeau-demo .bd-eq { overflow-wrap: anywhere; }
+.bandeau-conf { background: var(--muted); color: var(--muted-foreground);
+  border-bottom: 1px solid var(--border); font-size: var(--t-petit); line-height: 1.35;
+  padding: 4px 16px; text-align: center; }
+
+/* ============================ 3. Marque et icônes ============================ */
+/* Une seule famille d'icônes : les fichiers locaux de assets/icones, posés en masque
+   pour qu'ils prennent la couleur du texte (currentColor) sans script ni police d'icônes. */
+.ico, .monogramme { display: block; flex: 0 0 auto; background: currentColor;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+  -webkit-mask-size: contain; mask-size: contain; }
+.ico { width: 20px; height: 20px; }
+.monogramme { width: 24px; height: 24px; color: var(--primary); }
+.monogramme { -webkit-mask-image: url("icones/monogramme.svg"); mask-image: url("icones/monogramme.svg"); }
+.ico-accueil { -webkit-mask-image: url("icones/vue-ensemble.svg"); mask-image: url("icones/vue-ensemble.svg"); }
+.ico-classement { -webkit-mask-image: url("icones/classement.svg"); mask-image: url("icones/classement.svg"); }
+.ico-fiche { -webkit-mask-image: url("icones/fiche.svg"); mask-image: url("icones/fiche.svg"); }
+.ico-besoins { -webkit-mask-image: url("icones/besoins.svg"); mask-image: url("icones/besoins.svg"); }
+.ico-implantation { -webkit-mask-image: url("icones/implantation.svg"); mask-image: url("icones/implantation.svg"); }
+.ico-methode { -webkit-mask-image: url("icones/methode.svg"); mask-image: url("icones/methode.svg"); }
+.ico-pages { -webkit-mask-image: url("icones/pages.svg"); mask-image: url("icones/pages.svg"); }
+.ico-chevron { -webkit-mask-image: url("icones/chevron.svg"); mask-image: url("icones/chevron.svg"); }
+.ico-16 { width: 16px; height: 16px; }
+
+/* `flex-wrap: wrap` : le nom d'équipe est un mot long sans espace
+   (« EduPrioriteBurkina_MelissaJohn », 198 px mesurés à 12 px). Dans la barre haute mobile il ne
+   tient pas sur la même ligne que le nom du produit (347 px pour 247 px disponibles à 390) : il
+   passe sous le nom au lieu de déborder. Le rail n'affiche pas la pastille, rien n'y change. */
+.marque { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: wrap; }
+.marque-nom { font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+.marque-sous { color: var(--muted-foreground); font-size: var(--t-mini); white-space: nowrap; }
+/* pastille du nom d'équipe : elle passe à la ligne, et coupe le mot en dernier recours plutôt que
+   de dépasser de son conteneur (`anywhere` ne coupe que si c'est nécessaire) */
+.marque-eq { color: var(--muted-foreground); font-size: var(--t-mini);
+  border: 1px solid var(--border); border-radius: var(--radius-full); padding: 1px 8px;
+  overflow-wrap: anywhere; }
+
+/* ============================ 4. Coque : rail + zone de travail ============================ */
+.racine { display: flex; flex-direction: column; min-height: 100dvh; }
+.coque { display: flex; flex: 1 1 auto; min-height: calc(100dvh - 38px); align-items: stretch; }
+.rail { flex: 0 0 208px; background: var(--card); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; padding: 16px 8px 12px; gap: 16px; }
+.rail-marque { padding: 0 8px; display: flex; flex-direction: column; gap: 4px; }
+.rail-marque .marque-sous { padding-left: 32px; }
+.rail nav { display: flex; flex-direction: column; gap: 1px; }
+.rail .nav-item { display: flex; align-items: center; gap: 8px; min-height: 44px;
+  padding: 0 8px; border-radius: var(--radius-sm); color: var(--muted-foreground);
+  font-size: var(--t-petit); text-decoration: none; }
+.rail .nav-item .ico { color: var(--bord-fort); }
+.rail .nav-item:hover { background: var(--muted); color: var(--foreground); }
+.rail .nav-item:hover .ico { color: var(--muted-foreground); }
+.rail .nav-item.actif, .rail .nav-item[aria-current="page"] { background: var(--primary);
+  color: var(--primary-foreground); font-weight: 600; }
+.rail .nav-item.actif .ico, .rail .nav-item[aria-current="page"] .ico { color: var(--primary-foreground); }
+.rail .nav-item.actif:focus-visible { outline-color: var(--primary-foreground); }
+.rail-pied { margin-top: auto; padding: 12px 8px 0; border-top: 1px solid var(--border-faible);
+  display: flex; flex-direction: column; gap: 4px; color: var(--muted-foreground);
+  font-size: var(--t-mini); line-height: 1.4; }
+.rail-pied a { display: inline-flex; align-items: center; min-height: 24px;
+  color: var(--foreground); font-weight: 600; text-decoration: underline;
+  text-decoration-color: var(--bord-fort); text-decoration-thickness: 1px;
+  text-underline-offset: 4px; }
+
+/* Gouttières de la zone de travail : 12 px en haut et en bas, 16 px sur les côtés,
+   8 px entre deux blocs — la densité de référence, sur l'échelle fermée. */
+.travail { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column;
+  gap: 8px; padding: 12px 16px; }
+.travail-tete { display: flex; align-items: baseline; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; }
+.travail-tete h1 { font-size: var(--t-h1); }
+.perimetre { color: var(--muted-foreground); font-size: var(--t-petit); }
+/* Périmètre et mention de découpage dans un même groupe à droite du titre : alignés au centre
+   (et non sur la ligne de base), la pastille ne fait pas grandir l'en-tête. */
+.tete-droite { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+/* Mention de découpage : gabarit du code équipe du rail, jamais une alerte. */
+.decoupage { background: var(--muted); color: var(--muted-foreground);
+  border: 1px solid var(--border-faible); border-radius: var(--radius-full);
+  padding: 1px 8px; font-size: var(--t-mini); line-height: 1.3; white-space: nowrap; }
+.tete-mobile { display: none; }
+
+/* ============================ 5. Phrase-constat ============================ */
+.constat { font-size: var(--t-chapo); line-height: 1.5; max-width: 86ch; }
+/* Phrase-constat d'une vue « un écran » : 14 px et mesure 104 ch **à toute largeur** (et non au
+   seul point de rupture du rail) : l'intro d'une vue « un écran » est plus petite. Les
+   pages qui défilent gardent `--t-chapo`. */
+.racine-ecran .constat { font-size: var(--t-corps); max-width: 104ch; }
+.constat .chiffre { font-family: var(--police-chiffre); font-weight: 700;
+  font-variant-numeric: tabular-nums; letter-spacing: -0.02em; white-space: nowrap; }
+
+/* ============================ 6. Bande de chiffres clés ============================ */
+.bande-kpi { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); }
+/* 4 cellules au lieu de 6 (Besoins 2030) : même spécificité que `.bande-kpi` pour que les
+   points de rupture, écrits plus bas, la remplacent par 3 puis 2 colonnes. */
+.ligne-kpi-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.bande-kpi .kpi, .fiche-kpis .kpi { position: relative; display: flex; flex-direction: column;
+  gap: 1px; min-width: 0; }
+.bande-kpi .kpi { padding: 8px 12px; border-left: 1px solid var(--border-faible); }
+.bande-kpi .kpi:first-child { border-left: 0; }
+.kpi-lib { color: var(--muted-foreground); font-size: var(--t-petit); font-weight: 600;
+  line-height: 1.3; }
+.kpi-val { color: var(--foreground); font-size: var(--t-chiffre); font-weight: 700;
+  font-family: var(--police-chiffre); letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums; line-height: 1.1; }
+.kpi-unite { color: var(--muted-foreground); font-weight: 600; font-size: var(--g-unite); }
+.kpi-tend, .tendance { font-size: var(--t-petit); font-weight: 600; line-height: 1.35; }
+.kpi-ctx { color: var(--muted-foreground); font-size: var(--t-mini); line-height: 1.35; }
+/* Une ligne par ligne : la bande des 6 chiffres fait 96 px, quatre lignes d'une
+   ligne chacune. La règle ne vaut **qu'au-dessus de 1280 px**, là où les textes mesurés tiennent
+   vraiment (163 px de largeur utile à 1366, 176 à 1440) : entre 961 et 1280 px, une cellule de
+   160 px couperait « dont 3 954 redéployables » sans que rien ne permette de le lire.
+   En dessous, le texte passe à la ligne et la bande grandit de quelques pixels.
+   Filet supplémentaire : `composants.kpi` pose le texte entier en `title` sur chaque ligne
+   secondaire écrite en toutes lettres — une métadonnée coupée garde un moyen d'être lue. */
+.kpi-tend, .kpi-tend .tendance, .kpi-ctx { display: block; }
+@media (min-width: 1281px) {
+  .kpi-tend, .kpi-tend .tendance, .kpi-ctx { white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis; }
+}
+.t-pire { color: var(--statut-pire); }
+.t-mieux { color: var(--statut-mieux); }
+.t-neutre { color: var(--muted-foreground); font-weight: 400; }
+.fleche { font-size: var(--g-fleche); }
+.kpi-aide { cursor: help; }
+.kpi-aide .kpi-lib { text-decoration: underline dotted var(--bord-fort);
+  text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.kpi-aide:hover { background: var(--survol); }
+.kpi-aide:hover .kpi-lib, .kpi-aide:focus-visible .kpi-lib,
+.kpi-aide[aria-describedby="bulle-aide"] .kpi-lib {
+  text-decoration-color: var(--muted-foreground); color: var(--foreground); }
+
+/* ============================ 7. Infobulle et icône « i » ============================ */
+/* Seul élément flottant du produit ; posée en position fixe par assets/aide.js. */
+.bulle { z-index: 60; width: min(330px, calc(100vw - 32px)); padding: 12px; text-align: left;
+  background: var(--card); color: var(--card-foreground); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--ombre-overlay);
+  font-family: var(--police-ui); font-size: var(--t-petit); font-weight: 400; line-height: 1.45;
+  white-space: normal; pointer-events: none; }
+.bulle .b-def { display: block; color: var(--card-foreground); }
+.bulle .b-meta { display: block; color: var(--muted-foreground); font-size: var(--t-mini);
+  margin-top: 4px; }
+.bulle .b-lib { font-weight: 600; color: var(--foreground); }
+#bulle-aide { position: fixed; display: none; }
+#bulle-aide.visible { display: block; }
+.aide { position: relative; display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; margin-left: 4px; vertical-align: 1px;
+  border: 1px solid currentColor; border-radius: var(--radius-full);
+  color: var(--muted-foreground); flex: 0 0 auto;
+  font: italic 700 10px/1 Georgia, "Times New Roman", serif; cursor: help;
+  user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.aide:hover, .aide:focus-visible, .aide[aria-describedby="bulle-aide"] { color: var(--primary); }
+.aide::before { content: ""; position: absolute; inset: -16px -4px; }
+.avec-aide { display: inline; }
+.terme-aide { cursor: help; text-decoration: underline dotted var(--bord-fort);
+  text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.terme-aide:hover, .terme-aide[aria-describedby="bulle-aide"] { text-decoration-color: var(--muted-foreground); }
+
+/* ============================ 8. Tableaux, badges, barre de score ============================ */
+/* Dash 4 injecte la feuille de `dcc.Tabs` **en ligne, sur toutes les pages**, même sans onglets :
+   elle définit elle aussi `.tab` (un onglet : flex 1, fond, filet, 20/25 px de marge, texte centré,
+   curseur main) et reprend donc le tableau statique du kit, qui porte le même nom de classe.
+   `table.tab` (0,1,1) passe devant son `.tab` (0,1,0) quel que soit l'ordre d'injection : un
+   neutralisant de page serait à refaire à chaque écran. */
+table.tab { flex: 0 0 auto; background-color: transparent; border: 0; padding: 0;
+  text-align: left; cursor: auto; transition: none; }
+.tab { font-variant-numeric: tabular-nums; }
+.tab th { text-align: left; color: var(--muted-foreground); font-size: var(--t-mini);
+  font-weight: 600; padding: 0 8px 4px; border-bottom: 1px solid var(--border);
+  white-space: nowrap; }
+.tab td { padding: 8px; border-bottom: 1px solid var(--border-faible); vertical-align: middle; }
+.tab tbody tr:last-child td { border-bottom: 0; }
+.tab tbody tr:hover { background: var(--survol); }
+.tab .c-num { text-align: right; white-space: nowrap; font-family: var(--police-chiffre);
+  letter-spacing: -0.02em; }
+.tab th.c-num { text-align: right; font-family: var(--police-ui); letter-spacing: 0; }
+.tab-top10 .c-rang { width: 24px; text-align: right; color: var(--muted-foreground);
+  font-weight: 600; padding-left: 0; font-family: var(--police-chiffre); }
+/* Lien de province : 13 px/600, sinon la ligne hériterait du 14 px du corps de texte.
+   Ligne mesurée 41 px : nom 16 + région 15 + 8 de remplissage. */
+.tab-top10 .c-prov a { display: block; padding: 4px 0; margin: -4px 0;
+  color: var(--foreground); font-size: var(--t-petit); line-height: 1.25;
+  font-weight: 600; text-decoration: none; }
+.tab-top10 .c-prov a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.tab-top10 .reg-ligne { display: block; color: var(--muted-foreground); font-size: var(--t-mini);
+  font-weight: 400; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; }
+/* Nom d'avant 2025 sous le nom de province : exactement la seconde ligne
+   « région » du top 10, pour que l'œil lise la même chose au même endroit. Jamais tronquée. */
+.anciennement { display: block; color: var(--muted-foreground); font-size: var(--t-mini);
+  font-weight: 400; line-height: 1.3; }
+.tab-top10 .c-stat { white-space: nowrap; width: 1%; padding-right: 0; }
+.tab-top10 tr.ligne-sel { background: var(--primary-doux); }
+.tab-top10 tr.ligne-sel .c-prov a { color: var(--primary); }
+.cell-score { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.piste { flex: 0 0 44px; height: 4px; border-radius: var(--radius-xs); background: var(--piste);
+  overflow: hidden; }
+.barre { display: block; height: 100%; background: var(--piste-pleine);
+  border-radius: var(--radius-xs); }
+.val-score { min-width: 2.2em; text-align: right; font-family: var(--police-chiffre);
+  letter-spacing: -0.02em; }
+.ligne-centrale td { background: var(--muted); font-weight: 600; }
+/* Un tableau plus large que son bloc défile **dans son bloc**, jamais la page — et le dit : la
+   barre de défilement reste visible (fine) sur ordinateur comme sur téléphone. */
+.table-defile { overflow-x: auto; scrollbar-width: thin;
+  scrollbar-color: var(--bord-fort) transparent; }
+.table-defile .tab { min-width: 480px; }
+/* première colonne d'un tableau qui défile : un libellé de scénario ne tombe pas sur 4 lignes */
+.table-defile .tab th:first-child, .table-defile .tab td:first-child { min-width: 150px; }
+
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: var(--t-mini);
+  font-weight: 600; padding: 1px 8px; border-radius: var(--radius-full); white-space: nowrap;
+  line-height: 1.4; }
+.badge .pts { font-size: var(--g-puce); letter-spacing: 0.08em; }
+.badge-p1 { background: var(--badge-p1-bg); color: var(--badge-p1-fg); }
+.badge-p2 { background: var(--badge-p2-bg); color: var(--badge-p2-fg); }
+.badge-p3 { background: var(--badge-p3-bg); color: var(--badge-p3-fg); }
+
+/* ============================ 9. Carte, légendes, ligne « Lecture : » ============================ */
+/* Zone de la figure Plotly : elle porte le **format réel du pays** (1000 × 733) à toutes les
+   largeurs, la figure la remplit. Seule exception : dans une
+   vue construite pour un écran (`.racine-ecran`, ≥ 961 px), la rangée principale lui donne la
+   hauteur restante — la carte, elle, n'est jamais étirée, Plotly la recentre (`scaleanchor`).
+   La largeur maximale suit la hauteur maximale : plafonnée en hauteur, la zone garde la forme du
+   pays au lieu de s'étirer en bandeau (la figure, elle, y était déjà centrée). */
+.zone-carte { position: relative; display: flex; align-items: center; justify-content: center;
+  flex: 0 0 auto; min-height: 0; width: 100%; margin-inline: auto;
+  aspect-ratio: 1000 / 733; max-height: 44dvh; max-width: calc(44dvh * 1000 / 733); }
+.zone-carte > .dash-graph, .zone-carte > div { width: 100%; height: 100%; }
+
+.leg-titre { font-size: var(--t-petit); font-weight: 600; color: var(--foreground);
+  margin-bottom: 4px; }
+.leg-rampe { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 4px; }
+.leg-rampe .leg-case { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.leg-pastille { display: block; height: 8px; border-radius: var(--radius-xs);
+  border: 1px solid var(--bord-pastille); }
+.leg-c1 { background: var(--carte-1); }
+.leg-c2 { background: var(--carte-2); }
+.leg-c3 { background: var(--carte-3); }
+.leg-c4 { background: var(--carte-4); }
+.leg-c5 { background: var(--carte-5); }
+.leg-nd { background: var(--carte-nd); }
+.leg-txt { font-size: var(--t-mini); color: var(--muted-foreground); line-height: 1.25;
+  font-variant-numeric: tabular-nums; }
+/* Variante obligatoire quand la carte est dans une colonne latérale de moins de 480 px : à
+   5 colonnes de ~76 px, un libellé avec son unité (« moins de 20 % ») passe à la ligne et la
+   légende devient irrégulière. Mêmes règles que sous 621 px. */
+.leg-rampe-colonne { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+.leg-rampe-colonne .leg-case { flex-direction: row; align-items: center; gap: 8px; }
+.leg-rampe-colonne .leg-pastille { width: 24px; flex: 0 0 24px; height: 12px; }
+.legende-situation { display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+  color: var(--muted-foreground); font-size: var(--t-mini); }
+.pastille { display: inline-block; width: 12px; height: 12px; border-radius: var(--radius-xs);
+  border: 1px solid var(--bord-pastille); vertical-align: -1px; margin-right: 4px; }
+.pastille-province { background: var(--primary); }
+.pastille-region { background: var(--primary-region); margin-left: 8px; }
+/* légende de marqueurs (sites d'implantation) : le statut vient du motif, pas de la seule couleur */
+.legende-marqueurs { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 16px;
+  color: var(--muted-foreground); font-size: var(--t-mini); }
+/* deux légendes qui se suivent sous une carte : 8 px entre deux groupes d'un même bloc */
+.legende + .legende-marqueurs { margin-top: 8px; }
+.leg-item { display: inline-flex; align-items: center; gap: 4px; }
+.leg-lib { font-weight: 600; color: var(--foreground); }
+.leg-rond { display: inline-block; width: 12px; height: 12px; border-radius: var(--radius-full); }
+/* case rectangulaire d'une légende de motif (commune hachurée) : même filet que les pastilles */
+.leg-case-carte { display: inline-block; width: 16px; height: 12px;
+  border: 1px solid var(--bord-pastille); }
+/* l'accent est réservé à la sélection : un site fiable est un marqueur encre */
+.leg-fiable { background: var(--foreground); }
+.leg-verifier { border: 2px solid var(--statut-attention); background: var(--card); }
+.leg-hachure { background-image: repeating-linear-gradient(45deg, var(--hachure) 0,
+  var(--hachure) 1px, var(--card) 1px, var(--card) 4px); }
+
+.lecture { color: var(--muted-foreground); font-size: var(--t-mini); line-height: 1.45;
+  margin-top: 8px; }
+.lecture-lib { font-weight: 600; color: var(--foreground); }
+
+/* ============================ 10. Contrôles ============================ */
+.choix-lib { padding: 0; color: var(--muted-foreground); font-size: var(--t-mini);
+  font-weight: 600; }
+/* Chromium ajoute la largeur de la `<legend>` à la largeur intrinsèque du `<fieldset>` : le
+   contrôle se croyait ~167 px plus large que ses options, passait à la ligne dès 1366 px et ne
+   se calait jamais à droite de `.carte-outils`. Une colonne flexible rend la largeur réelle. */
+.choix-segment { display: flex; flex-direction: column; align-items: flex-start;
+  width: fit-content; max-width: 100%; }
+.choix .opt { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+/* `flex-wrap: wrap` : à 1024×600 les trois options dépasseraient leur panneau de
+   38 px. Elles passent sur deux lignes dans la même piste ; chaque option garde `nowrap`, donc un
+   libellé n'est jamais coupé. */
+.choix-segment .choix-opts { display: inline-flex; flex-wrap: wrap; background: var(--muted);
+  border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1px; gap: 1px; }
+.choix-segment .opt { position: relative; }
+.choix-segment .opt input { position: absolute; opacity: 0; width: 100%; height: 100%;
+  margin: 0; cursor: pointer; }
+.choix-segment .opt-txt { display: block; padding: 8px 12px; border-radius: var(--radius-xs);
+  font-size: var(--t-mini); font-weight: 600; color: var(--muted-foreground);
+  white-space: nowrap; }
+.choix-segment .opt input:checked + .opt-txt,
+.choix-segment .opt.selected .opt-txt { background: var(--primary);
+  color: var(--primary-foreground); }
+.choix-segment .opt input:focus-visible + .opt-txt { outline: 2px solid var(--ring);
+  outline-offset: 2px; }
+/* RadioItems de Dash : <label class="dash-options-list-option [selected]"> + span de texte */
+.choix-segment .choix-radios { display: inline-flex; flex-wrap: wrap; gap: 1px; }
+.choix-segment .dash-options-list-option { position: relative; display: inline-flex;
+  align-items: center; cursor: pointer; margin: 0; }
+.choix-segment .dash-options-list-option-wrapper { position: absolute; inset: 0; opacity: 0; }
+.choix-segment .dash-options-list-option-wrapper input { width: 100%; height: 100%; margin: 0;
+  cursor: pointer; }
+.choix-segment .dash-options-list-option.selected .opt-txt { background: var(--primary);
+  color: var(--primary-foreground); }
+.choix-segment .dash-options-list-option:has(input:focus-visible) .opt-txt {
+  outline: 2px solid var(--ring); outline-offset: 2px; }
+
+/* Barre de filtres **sans cadre** : les champs portent déjà leur filet, un
+   panneau autour coûterait 26 px par page. L'action d'export est sur la même ligne,
+   alignée à droite et sur le bas des champs ; une note éventuelle prend sa propre ligne. */
+.barre-filtres { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 12px; }
+.barre-filtres > .btn-contour, .barre-filtres > .btn-plein { margin-left: auto; }
+.barre-filtres > .note { flex: 1 1 100%; }
+/* `.filtres` reste pour une page qui garde une grille de filtres (Besoins 2030) */
+.filtres { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.filtre { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.filtre-lib { color: var(--muted-foreground); font-size: var(--t-mini); font-weight: 600; }
+.menu { -webkit-appearance: none; appearance: none; min-height: 44px; width: 100%;
+  padding: 8px 32px 8px 12px; background: var(--card); color: var(--foreground);
+  border: 1px solid var(--bord-fort); border-radius: var(--radius-sm);
+  font-family: var(--police-ui); font-size: var(--t-corps); line-height: 1.3; }
+.champ-menu { position: relative; display: block; }
+.champ-menu .ico-chevron { position: absolute; right: 8px; top: 50%; width: 16px; height: 16px;
+  margin-top: -8px; color: var(--muted-foreground); pointer-events: none; }
+.filtre-large { flex: 1 1 320px; max-width: 420px; }
+.filtre-moyen { flex: 0 1 200px; }
+
+.btn-plein { background: var(--primary); color: var(--primary-foreground);
+  border: 1px solid var(--primary); border-radius: var(--radius-sm); padding: 8px 16px;
+  min-height: 44px; font-size: var(--t-petit); font-weight: 600; cursor: pointer; }
+.btn-contour { background: transparent; color: var(--foreground);
+  border: 1px solid var(--bord-fort); border-radius: var(--radius-sm); padding: 8px 12px;
+  min-height: 40px; font-size: var(--t-mini); font-weight: 600; cursor: pointer;
+  white-space: nowrap; }
+a.btn-plein, a.btn-contour { display: inline-flex; align-items: center; justify-content: center;
+  text-decoration: none; }
+.btn-plein:active, .btn-contour:active, .tm-bouton:active { transform: translateY(1px);
+  transition: transform 120ms ease-out; }
+.btn-plein[disabled], .btn-contour[disabled] { color: var(--muted-foreground);
+  background: var(--muted); cursor: not-allowed; }
+.lien-suite { display: inline-flex; align-items: center; min-height: 24px;
+  font-size: var(--t-petit); font-weight: 600; color: var(--foreground);
+  text-decoration: underline; text-decoration-color: var(--bord-fort);
+  text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.lien-suite:hover { text-decoration-color: var(--foreground); }
+
+/* ============================ 11. Blocs ============================ */
+.rangee { display: grid; align-items: stretch;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 440px); gap: 8px; }
+.panneau { background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); display: flex; flex-direction: column; min-height: 0;
+  padding: 8px 12px; }
+.panneau-tete { display: flex; align-items: baseline; justify-content: space-between;
+  gap: 8px; margin-bottom: 4px; }
+.panneau-tete h2 { font-size: var(--t-corps); }
+.note { color: var(--muted-foreground); font-size: var(--t-mini); }
+/* `flex-start` et non `center` : aligné au centre, le titre « Les 45 provinces » descendait de
+   ~24 px contre le bloc « Mesure affichée sur la carte » et n'avait plus l'air d'un titre. */
+.carte-outils { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  flex-wrap: wrap; margin-bottom: 4px; }
+.carte-outils .panneau-tete { margin-bottom: 0; }
+.carte-outils .choix-lib { display: block; margin-bottom: 4px; }
+/* trois boutons de carte : aucune icône, posés à droite de .carte-outils */
+.outils-carte { display: flex; gap: 4px; }
+.bloc-carte .legende { margin-top: 8px; }
+/* Boîte d'un tableau : elle
+   **remplit** son panneau, et c'est le tableau qui reçoit la hauteur en trop — jamais le fond du
+   panneau. Dans une vue « un écran », elle défile dedans quand la place manque (§ 16). */
+.zone-liste { flex: 1 1 auto; min-height: 0; }
+.panneau-pied { margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--border-faible);
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.panneau-pied .lien-suite { white-space: nowrap; }
+.pile { display: flex; flex-direction: column; gap: 8px; }
+/* Enveloppe du contenu qu'un bloc erreur remplace : elle ne change rien à la
+   mise en page, elle donne seulement une prise pour tout faire disparaître d'un coup. */
+.zone-contenu { min-width: 0; }
+.ligne-outils { display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; flex-wrap: wrap; }
+/* Zone d'un graphique qui doit occuper la hauteur restante de son panneau (le panneau est une
+   colonne flexible) : la figure Plotly s'y redimensionne au lieu d'imposer sa hauteur. */
+.zone-graphique { flex: 1 1 auto; min-height: 240px; }
+.zone-graphique > .dash-graph, .zone-graphique > div { width: 100%; height: 100%; }
+
+/* ---- Bloc « L'équipe » ---- */
+/* Une case = portrait rond, nom, rôle, une ligne de texte court. Ni avatar dessiné, ni initiale en
+   pastille : quand le fichier de portrait est absent (clone du projet, machine de démonstration),
+   la case se rend sans image plutôt qu'avec une image cassée (composants.photo_presente). */
+.eq-grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; }
+.eq-membre { display: flex; align-items: flex-start; gap: 12px; }
+.eq-photo { flex: 0 0 auto; width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
+  border: 1px solid var(--border); background: var(--muted); }
+/* le texte vit dans un conteneur qui peut rétrécir : un nom long passe à la ligne, il n'est jamais
+   tronqué, et il ne pousse jamais la photo hors de la case */
+.eq-txt { min-width: 0; }
+.eq-nom { font-size: var(--t-corps); font-weight: 600; }
+.eq-role { color: var(--muted-foreground); font-size: var(--t-petit); }
+.eq-bio { color: var(--muted-foreground); font-size: var(--t-petit); }
+
+/* ---- Corps de texte (écran « À propos et méthode ») ---- */
+/* Mesure de ligne de 72 caractères : le texte ne s'étire pas à la largeur de la colonne, même sur
+   un écran large. Rythme : 8 px entre deux blocs, 4 px dans une liste. */
+.texte, .liste, .note-limite { font-size: var(--t-petit); line-height: 1.5; max-width: 72ch; }
+.liste { padding-left: 16px; }
+.liste li + li { margin-top: 4px; }
+.texte + .texte, .texte + .liste, .liste + .texte, .texte + .note-limite,
+.note-limite + .texte, .note-limite + .liste, .texte + .table-defile,
+.table-defile + .lecture, .liste + .note { margin-top: 8px; }
+/* Note de limite : bloc encadré neutre, sans barre latérale ni couleur de statut */
+.note-limite { background: var(--muted); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 8px 12px; }
+
+/* ============================ 12. États ============================ */
+.sk { display: block; position: absolute; inset: 0; border-radius: var(--radius-xs);
+  background: var(--squelette); }
+.sk-zone { position: relative; }
+.sk-zone > .sk { position: absolute; }
+.v { position: relative; display: inline-block; min-width: 2em; color: transparent; }
+/* chargement d'une carte : l'aplat occupe la zone, qui porte déjà le format 1000/733 (§ 9) */
+.zone-carte > .sk { position: absolute; inset: 0; }
+.bande-obsolete { display: flex; align-items: center; gap: 8px;
+  border: 1px solid var(--bord-attention); background: var(--fond-attention);
+  border-radius: var(--radius-sm); padding: 8px 12px; }
+.bande-obsolete p { font-size: var(--t-petit); flex: 1 1 auto; min-width: 0; }
+.obs-pt { flex: 0 0 auto; width: 8px; height: 8px; border-radius: var(--radius-full);
+  background: var(--statut-attention); }
+.etiq-fraicheur-obsolete { color: var(--statut-pire); }
+.bloc-erreur { border: 1px solid var(--bord-erreur); background: var(--fond-erreur);
+  border-radius: var(--radius); padding: 24px; max-width: 620px; margin: 8px 0; }
+.bloc-erreur h2 { font-size: var(--t-chapo); color: var(--statut-pire); margin-bottom: 8px; }
+.bloc-erreur p { font-size: var(--t-petit); margin-bottom: 4px; max-width: 54ch; }
+.bloc-erreur .err-detail { color: var(--muted-foreground); font-size: var(--t-mini);
+  margin-bottom: 16px; }
+/* une adresse inconnue n'est pas une panne de données : même gabarit, ton neutre */
+.bloc-introuvable { background: var(--muted); border-color: var(--border); }
+.bloc-introuvable h2 { color: var(--foreground); }
+.etiq-chargement { color: var(--muted-foreground); font-size: var(--t-mini); }
+.vide { border: 1px dashed var(--bord-fort); border-radius: var(--radius-sm); padding: 16px;
+  color: var(--muted-foreground); font-size: var(--t-petit); }
+.vide strong { color: var(--foreground); font-weight: 600; }
+
+/* ============================ 13. Fiche province ============================ */
+/* Rangée à fond plat : pas d'`align-items: start`, les deux panneaux font la hauteur de la
+   rangée et se terminent sur la même ligne. */
+.fiche-haut { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 12px; }
+/* La carte de situation ne plafonne pas : elle **remplit** la
+   hauteur laissée par son panneau et absorbe l'écart entre les deux panneaux dans les deux sens.
+   Si l'identité est plus haute (nom sur deux lignes, région longue), la carte grandit et le blanc
+   vaut 0 ; si elle est plus courte, le reste — borné par le plancher de lisibilité — va dans la
+   bande de chiffres, centré dans ses cellules. Plafonner la carte revient à faire absorber
+   l'écart par la bande, c'est-à-dire à ouvrir un blanc à l'intérieur du panneau. */
+.fiche-haut .zone-carte { flex: 1 1 auto; min-height: 140px; max-height: none;
+  max-width: none; aspect-ratio: auto; }
+.fiche-identite h2 { font-size: var(--t-h1); }
+.fiche-identite .f-region { color: var(--muted-foreground); font-size: var(--t-petit);
+  margin-top: 1px; }
+.fiche-identite .f-rang { margin-top: 8px; display: flex; align-items: center;
+  gap: 8px; flex-wrap: wrap; font-size: var(--t-mini); color: var(--muted-foreground); }
+/* La bande des 4 chiffres descend jusqu'au bord inférieur du panneau, valeurs centrées dans leur
+   cellule. Elle n'absorbe pas l'écart
+   entre les deux panneaux — c'est la carte d'en face qui s'en charge : le reste, borné par son
+   plancher de 140 px, vaut au plus 9 px, soit ~5 px de part et d'autre des chiffres. */
+.fiche-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--border-faible); margin-top: 12px; flex: 1 1 auto; }
+.fiche-kpis .kpi { padding: 8px 12px; border-left: 1px solid var(--border-faible);
+  justify-content: center; }
+.fiche-kpis .kpi:first-child { border-left: 0; padding-left: 0; }
+.grille-fiche { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 8px; align-items: start; }
+.grille-fiche-57 { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+.legende-serie { display: flex; gap: 16px; flex-wrap: wrap; font-size: var(--t-mini);
+  color: var(--muted-foreground); margin-bottom: 4px; }
+.legende-serie .trait { display: inline-block; width: 16px; height: 0;
+  border-top: 2px solid var(--serie-1); vertical-align: 3px; margin-right: 4px; }
+.legende-serie .trait-2 { border-top-style: dashed; border-top-color: var(--serie-2); }
+.comp { display: flex; flex-direction: column; gap: 8px; }
+.comp-ligne { display: grid; grid-template-columns: 148px minmax(0, 1fr) 40px;
+  align-items: center; gap: 8px; font-size: var(--t-petit); }
+.comp-lib { color: var(--foreground); }
+.comp-piste { height: 12px; background: var(--piste); border-radius: var(--radius-xs); }
+.comp-barre { display: block; height: 100%; background: var(--piste-pleine);
+  border-radius: var(--radius-xs); }
+.comp-val { text-align: right; font-family: var(--police-chiffre); letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums; color: var(--muted-foreground); }
+/* `minmax(0, auto)` sur la colonne des valeurs : une valeur sans point de coupure (adresse,
+   identifiant) ne peut pas écraser la colonne des libellés jusqu'à un mot par ligne. */
+.liste-chiffres { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, auto); gap: 0; }
+/* graisse normale, comme le gabarit : la hiérarchie vient du gris et de la police chiffrée de la
+   valeur, pas d'un libellé en gras (un `dt` est gras par défaut dans certains socles) */
+.liste-chiffres dt { padding: 8px 0; border-bottom: 1px solid var(--border-faible);
+  font-size: var(--t-petit); font-weight: 400; }
+.liste-chiffres dd { padding: 8px 0; border-bottom: 1px solid var(--border-faible);
+  text-align: right; font-family: var(--police-chiffre); letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums; font-weight: 600; font-size: var(--t-petit); }
+.liste-chiffres dt:last-of-type, .liste-chiffres dd:last-of-type { border-bottom: 0; }
+/* une valeur venue des données qui n'a aucun point de coupure (adresse, identifiant) se coupe
+   plutôt que de pousser son bloc ; un nombre, lui, reste en `white-space: nowrap` */
+.valeur-insecable { overflow-wrap: anywhere; }
+
+/* ============================ 14. Composants Dash ============================ */
+/* Les composants de Dash 4 lisent leurs propres variables : on les branche sur les jetons
+   du projet (l'accent par défaut de Dash est violet). :root:root passe devant leur feuille. */
+:root, :root:root {
+  --Dash-Fill-Interactive-Strong: var(--primary);
+  --Dash-Fill-Interactive-Weak: var(--muted);
+  --Dash-Fill-Inverse-Strong: var(--card);
+  --Dash-Fill-Disabled: var(--border-faible);
+  --Dash-Fill-Primary-Hover: var(--survol);
+  --Dash-Fill-Primary-Active: var(--primary-doux);
+  --Dash-Stroke-Strong: var(--bord-fort);
+  --Dash-Stroke-Weak: var(--border-faible);
+  --Dash-Text-Strong: var(--foreground);
+  --Dash-Text-Primary: var(--foreground);
+  --Dash-Text-Weak: var(--muted-foreground);
+  --Dash-Text-Disabled: var(--muted-foreground);
+}
+/* liste déroulante (dropdown) : même champ que .menu, menu posé en surface unique */
+.dash-dropdown-wrapper { overflow: hidden; }
+.dash-dropdown-focus-target { width: 100% !important; max-width: 100%; }
+.dash-dropdown { font-family: var(--police-ui); font-size: var(--t-corps); }
+.dash-dropdown-trigger { min-height: 44px; padding: 0 12px; background: var(--card);
+  color: var(--foreground); border: 1px solid var(--bord-fort);
+  border-radius: var(--radius-sm); min-width: 0; }
+/* une valeur très longue (nom de province + région) se tronque **dans** le champ au lieu de
+   pousser la page : la liste déroulante l'écrit en entier */
+.dash-dropdown-value-item { min-width: 0; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; }
+.dash-dropdown[disabled] .dash-dropdown-trigger, .dash-dropdown:disabled .dash-dropdown-trigger {
+  background: var(--muted); color: var(--muted-foreground); cursor: not-allowed; }
+.dash-dropdown-content { background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); font-size: var(--t-petit);
+  box-shadow: var(--ombre-overlay); }
+.dash-dropdown-option { padding: 8px 12px; font-size: var(--t-petit); }
+.dash-dropdown-option:hover, .dash-dropdown-option.highlighted { background: var(--survol); }
+.dash-dropdown-option.selected, .dash-dropdown-option[aria-selected="true"] {
+  background: var(--primary-doux); color: var(--primary); font-weight: 600; }
+.dash-dropdown-search-container { border-radius: var(--radius-sm);
+  border: 1px solid var(--bord-fort); }
+/* tableau de données : même rendu que .tab (les valeurs littérales sont dans les pages) */
+.dash-table-container .dash-spreadsheet-container { font-family: var(--police-ui); }
+.zone-liste .dash-table-container, .zone-liste .dash-spreadsheet-container { height: 100%; }
+/* Le DataTable pose ses propres variables sur le tableau — accent « hotpink », sélection rouge —
+   avec une spécificité de (0,3,1) : il faut au moins quatre classes pour les rebrancher sur les
+   jetons du projet, comme le fait le bloc `--Dash-*` ci-dessus. */
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner table {
+  --accent: var(--primary);
+  --selected-background: var(--primary-doux);
+  --text-color: var(--foreground);
+  --hover: var(--survol);
+  --border: var(--border-faible);
+}
+/* La cellule cliquée reçoit en plus un style **en ligne** rose/rouge (palette du composant) :
+   seul un `!important` le ramène aux jetons. La sélection se marque avec l'accent, comme partout. */
+.dash-table-container td.dash-cell { border-color: var(--border-faible) !important; }
+.dash-table-container td.dash-cell.cell--selected,
+.dash-table-container td.dash-cell.focused { background-color: var(--primary-doux) !important;
+  border-color: var(--primary) !important; }
+.dash-table-container .dash-spreadsheet-inner td.dash-cell, .dash-table-container th.dash-header {
+  font-family: var(--police-ui); }
+.dash-table-container .dash-spreadsheet-inner tr:hover td.dash-cell { background: var(--survol); }
+.dash-table-container .dash-cell-value p { margin: 0; }
+/* Un `DataTable` ne rend que du markdown : la ligne « anciennement » s'y écrit `*anciennement : X*`
+   et cette règle lui donne exactement le rendu de `.anciennement`. */
+.dash-table-container .dash-cell em { display: block; font-style: normal;
+  font-size: var(--t-mini); color: var(--muted-foreground); line-height: 1.3; }
+.dash-table-container .dash-cell a { color: var(--foreground); font-weight: 600;
+  text-decoration: none; }
+.dash-table-container .dash-cell a:hover { text-decoration: underline;
+  text-underline-offset: 3px; }
+/* Le sélecteur de casse « Aa » que le composant pose dans chaque cellule de filtre : deux lettres
+   sans libellé, alors que les pages fixent déjà le filtre en « insensible à la casse ». */
+.dash-table-container input.dash-filter--case { display: none; }
+.dash-table-container .dash-filter input { font-family: var(--police-ui); color: var(--foreground);
+  font-size: var(--t-mini); width: 100%; min-width: 0; background: transparent;
+  border: 0; border-radius: var(--radius-xs); }
+/* Le composant pose `outline: none` sur ses champs de filtre : au clavier, rien ne disait où on
+   était. L'anneau du kit est remis, à l'intérieur de la cellule pour ne pas être rogné. */
+.dash-table-container .dash-filter input:focus,
+.dash-table-container .dash-filter input:focus-visible { outline: 2px solid var(--ring);
+  outline-offset: -1px; }
+/* Trier au clic **sur toute la cellule d'en-tête**, et pas seulement sur l'icône de 8 × 15 px que
+   rend le composant : le pseudo-élément appartient à l'icône, donc un clic n'importe où dans
+   l'en-tête déclenche son tri. `assets/tableau.js` ajoute le pendant clavier (icône focalisable). */
+.dash-table-container th.dash-header { position: relative; }
+.dash-table-container th.dash-header .column-header--sort::after { content: ""; position: absolute;
+  inset: 0; cursor: pointer; }
+.dash-table-container th.dash-header .column-header--sort:focus { outline: none; }
+.dash-table-container th.dash-header .column-header--sort:focus-visible::after {
+  outline: 2px solid var(--ring); outline-offset: -2px; border-radius: var(--radius-xs); }
+/* Un tableau plus large que son bloc défile dans son bloc, et le **montre** : sans barre visible,
+   rien ne dit que des colonnes attendent à droite (les barres superposées de Chromium
+   n'apparaissent qu'au défilement). Barre fine permanente, aux jetons du kit. */
+/* `.dt-table-container__row` est l'élément qui défile vraiment quand le tableau n'a pas de hauteur
+   fixe : sans lui, la barre ne s'affiche pas sur l'écran Implantation. */
+.dash-table-container .dash-spreadsheet, .dash-table-container .dt-table-container__row,
+.zone-liste { scrollbar-width: thin; scrollbar-color: var(--bord-fort) transparent; }
+.table-defile::-webkit-scrollbar, .zone-liste::-webkit-scrollbar,
+.dash-table-container .dt-table-container__row::-webkit-scrollbar,
+.dash-table-container .dash-spreadsheet::-webkit-scrollbar { width: 8px; height: 8px; }
+.table-defile::-webkit-scrollbar-track, .zone-liste::-webkit-scrollbar-track,
+.dash-table-container .dt-table-container__row::-webkit-scrollbar-track,
+.dash-table-container .dash-spreadsheet::-webkit-scrollbar-track { background: var(--muted); }
+.table-defile::-webkit-scrollbar-thumb, .zone-liste::-webkit-scrollbar-thumb,
+.dash-table-container .dt-table-container__row::-webkit-scrollbar-thumb,
+.dash-table-container .dash-spreadsheet::-webkit-scrollbar-thumb { background: var(--bord-fort);
+  border-radius: var(--radius-xs); }
+.dash-table-tooltip { font-size: var(--t-petit); font-family: var(--police-ui);
+  border-radius: var(--radius-sm); }
+/* figures Plotly : le cadre est celui du panneau, jamais une ombre */
+.js-plotly-plot .plotly .modebar { display: none; }
+.js-plotly-plot, .plot-container { min-width: 0; }
+._dash-loading { margin: 24px auto; color: var(--muted-foreground); font-size: var(--t-petit); }
+
+/* ============================ 15. Page de connexion ============================ */
+.page-connexion { min-height: 100dvh; background: var(--background); margin: 0;
+  display: flex; align-items: flex-start; justify-content: center; }
+.carte-connexion { background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px; width: min(420px, 100%); margin: 40px 16px; }
+.carte-connexion .marque { margin-bottom: 4px; }
+.carte-connexion h1 { font-size: var(--t-h1); font-weight: 700; }
+.carte-connexion .co-sous { color: var(--muted-foreground); font-size: var(--t-petit);
+  margin-bottom: 24px; }
+.carte-connexion label { display: block; color: var(--muted-foreground);
+  font-size: var(--t-mini); font-weight: 600; margin-bottom: 4px; }
+.carte-connexion input[type="password"] { width: 100%; min-height: 44px; padding: 8px 12px;
+  font-family: var(--police-ui); font-size: var(--t-chapo); color: var(--foreground);
+  background: var(--card); border: 1px solid var(--bord-fort);
+  border-radius: var(--radius-sm); margin-bottom: 16px; }
+.carte-connexion .btn-plein { width: 100%; }
+.carte-connexion .co-conf { color: var(--muted-foreground); font-size: var(--t-mini);
+  margin-top: 24px; }
+.carte-connexion .bloc-erreur { padding: 16px; margin: 0 0 16px; }
+.carte-connexion .bloc-erreur p { color: var(--statut-pire); margin: 0; }
+
+/* ============================ 16. Points de rupture ============================ */
+@media (min-width: 961px) {
+  /* le rail reste visible quand la zone de travail défile (pages qui défilent : Fiche, Besoins,
+     À propos) ; sur une vue « un écran » il fait déjà la hauteur de la coque, cf. plus bas */
+  .rail { position: sticky; top: 0; align-self: flex-start; height: calc(100dvh - 38px); }
+  .tab-top10 td { padding: 4px 8px; }
+  /* ---- Verrou « un écran » : le document ne défile pas ----
+     La coque est verrouillée sur la hauteur de la fenêtre et c'est la **liste** qui défile dans
+     son panneau. `dvh` et jamais l'unité de fenêtre fixe (Android bas de gamme).
+     `overflow-y: auto` sur `.travail` n'est un filet de sécurité que si quelque chose peut
+     dépasser : sans plancher, la rangée, la carte et la liste se contractent toutes à zéro et la
+     carte finit en bandeau de 40 px **sans aucun moyen de la retrouver** (mesuré à 1280×500 et
+     1024×600). Les planchers ci-dessous font déborder la zone de travail —
+     elle défile alors, le contenu reste entier, et la page, elle, ne défile toujours pas. */
+  .racine-ecran { height: 100dvh; overflow: hidden; }
+  .racine-ecran .coque { flex: 1 1 auto; min-height: 0; }
+  .racine-ecran .rail { position: static; height: auto; overflow-y: auto; }
+  .racine-ecran .travail { min-height: 0; overflow-y: auto; }
+  /* La zone de liste **remplit** le panneau, et la hauteur en trop va au **tableau** — donc à ses
+     lignes — et non au fond du panneau : une liste qui garde sa hauteur naturelle laisse 160 px
+     de vide (mesuré) entre la ligne « Lecture : » et le pied à 1440×900.
+     Un tableau HTML à `height: 100%` répartit nativement la hauteur sur ses lignes (41 px à
+     1366×768, 54 px à 1440×900, 72 px à 1920×1080) ; un `DataTable` (Classement, Implantation),
+     lui, ne répartit pas : il occupe la zone et défile dedans, la dernière ligne visible pouvant
+     être coupée — c'est le signal qu'il y a une suite. Aucun plafond sur le tableau : il
+     ramènerait le vide au bas de la zone. Le pied, lui, suit le contenu (pas de `margin-top:
+     auto` : il n'a rien à combler). */
+  .racine-ecran .zone-liste { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+  .racine-ecran .zone-liste > .tab-top10 { height: 100%; }
+  /* vues construites pour un écran : la rangée principale occupe la hauteur restante, et la
+     zone de carte avec elle (c'est la seule exception au format 1000/733 de la zone, § 9) */
+  .racine-ecran .travail > div { flex: 1 1 auto; min-height: 0; }
+  .racine-ecran .travail > div > .zone-contenu { flex: 1 1 auto; min-height: 0; }
+  /* Plancher de la rangée principale : au-delà du budget vertical (663 px à 1440×900,
+     531 px à 1366×768) elle prend la hauteur restante ; en dessous de 420 px elle ne se contracte
+     plus, la zone de travail déborde et défile. Même règle pour les trois vues « un écran » :
+     aucune feuille de page n'a à la réécrire. */
+  .racine-ecran .rangee { flex: 1 1 auto; min-height: 420px; }
+  /* Seule la carte de la **colonne principale** prend la hauteur restante. Une carte de colonne
+     latérale (Classement, Implantation) garde le format du pays : étirée, elle flottait au milieu
+     d'une boîte deux fois trop haute (~145 px de vide sous son titre). Son plancher est celui
+     d'une figure du kit (240 px, comme `.zone-graphique`) : en dessous, une carte du Burkina
+     n'est plus lisible, et c'est la zone de travail qui défile. */
+  .racine-ecran .rangee > :first-child .zone-carte { flex: 1 1 auto; aspect-ratio: auto;
+    max-height: none; max-width: none; min-height: 240px; }
+  /* et le panneau latéral se ferme proprement sur la ligne de son voisin : la ligne « Lecture : »
+     est poussée en bas du bloc */
+  .racine-ecran .rangee > :last-child .bloc-carte .lecture { margin-top: auto; }
+}
+@media (min-width: 961px) and (max-height: 820px) {
+  .zone-carte { max-height: 42dvh; max-width: calc(42dvh * 1000 / 733); }
+}
+/* Entre 961 et 1320 px, un libellé de chiffre passe sur deux lignes et les six valeurs se posent
+   à des hauteurs différentes (mesuré à 1024×600 et 1280×600). 34 px = deux
+   lignes de 13 px à 1,3. Au-delà de 1320 px aucun libellé ne passe à la ligne : le budget d'un
+   écran (bande de 96 px à 1366 et 1440) n'est pas touché. */
+@media (min-width: 961px) and (max-width: 1320px) {
+  .bande-kpi .kpi-lib { min-height: 34px; }
+}
+@media (max-width: 1180px) {
+  .rangee { grid-template-columns: minmax(0, 1fr) minmax(320px, 380px); }
+  .fiche-haut { grid-template-columns: minmax(0, 1fr) 320px; }
+}
+@media (max-width: 960px) {
+  .coque { display: block; min-height: 0; }
+  .rail { display: none; }
+  .tete-mobile { display: block; background: var(--card);
+    border-bottom: 1px solid var(--border); padding: 8px 16px; }
+  .tm-haut { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .tm-bouton { display: inline-flex; align-items: center; gap: 4px; min-height: 44px;
+    padding: 0 12px; background: transparent; border: 1px solid var(--bord-fort);
+    border-radius: var(--radius-sm); color: var(--foreground); font-size: var(--t-petit);
+    font-weight: 600; cursor: pointer; }
+  .tm-menu { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px;
+    margin-top: 8px; }
+  .tm-menu a { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 8px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: var(--t-petit);
+    color: var(--foreground); text-decoration: none; }
+  .tm-menu a.actif { background: var(--primary); color: var(--primary-foreground);
+    border-color: var(--primary); font-weight: 600; }
+  /* zone sûre des téléphones à encoche (la page est en viewport-fit=cover) */
+  .travail { padding: 12px 16px 32px;
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    padding-bottom: max(32px, env(safe-area-inset-bottom)); }
+  .tete-mobile, .bandeau-demo, .bandeau-conf {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right)); }
+  .rangee, .fiche-haut, .grille-fiche { grid-template-columns: minmax(0, 1fr); }
+  .bande-kpi { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .bande-kpi .kpi:nth-child(3n+1) { border-left: 0; }
+  .bande-kpi .kpi:nth-child(n+4) { border-top: 1px solid var(--border-faible); }
+  /* le rail a disparu : la carte prend toute la largeur, sa hauteur suit son format. La remise à
+     zéro de la carte de situation s'écrit avec la **même spécificité** que son plafond (0,2,0),
+     sinon la règle `.zone-carte` seule (0,1,0) ne gagnerait pas. */
+  .zone-carte { max-height: none; max-width: none; }
+  /* en une colonne il n'y a plus d'écart à absorber : la carte de situation reprend son format
+     et sa hauteur naturelle (même spécificité (0,2,0) que la règle du § 13) */
+  .fiche-haut .zone-carte { flex: 0 0 auto; min-height: 0; max-height: none; max-width: none;
+    aspect-ratio: 1000 / 733; }
+  /* cible tactile : 44 px minimum sur tout bouton dès que le rail disparaît */
+  .btn-contour { min-height: 44px; }
+  /* l'icône « i » garde ses 16 px à l'écran, sa zone de contact fait 44 × 44 */
+  .aide::before { inset: -14px; }
+  .tab-top10 .c-prov a { padding: 12px 0; margin: -12px 0; }
+  /* même cible de 44 px sur le lien de province d'un DataTable : le composant impose 30 px de
+     haut et son remplissage en ligne, d'où le `!important` */
+  .dash-table-container .dash-spreadsheet-inner tbody tr { height: 44px; }
+  .dash-table-container .dash-spreadsheet-inner tbody td.dash-cell { padding: 12px 8px !important; }
+  .dash-table-container .dash-spreadsheet-inner tbody td.dash-cell a { display: block;
+    min-height: 44px; padding: 12px 0; margin: -12px 0; }
+  /* le champ de filtre d'un tableau est une cible tactile comme une autre */
+  .dash-table-container .dash-filter input { min-height: 44px; }
+  /* pastilles de rang illisibles sur un téléphone : le contour noir reste,
+     le rang se lit dans la liste — la ligne « Lecture : » le dit */
+  .js-plotly-plot .tracerangs-traits, .js-plotly-plot .tracerangs-pastilles { display: none; }
+  .lien-suite { min-height: 44px; }
+  .zone-liste { overflow-x: auto; }
+}
+@media (max-width: 620px) {
+  .travail-tete { gap: 0; }
+  /* La mention de découpage **quitte sa pastille** sur un téléphone : à
+     390 px la plus longue mesure 358 px dans un en-tête de 343 px et déborderait. Elle devient une
+     ligne de texte de contexte, qui passe à la ligne librement — une pastille à rayon plein coupée
+     sur deux lignes serait une forme bâtarde. Le texte n'est ni raccourci, ni abrégé, ni masqué ;
+     au-dessus de 621 px, rien ne change (le budget d'un écran n'est pas touché). */
+  .decoupage { background: transparent; border: 0; border-radius: 0; padding: 0;
+    white-space: normal; }
+  .constat { font-size: var(--t-corps); }
+  .carte-outils { flex-direction: column; align-items: stretch; gap: 8px; }
+  .piste { display: none; }
+  .bande-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bande-kpi .kpi { border-left: 1px solid var(--border-faible); border-top: 0; }
+  .bande-kpi .kpi:nth-child(odd) { border-left: 0; }
+  .bande-kpi .kpi:nth-child(n+3) { border-top: 1px solid var(--border-faible); }
+  .fiche-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fiche-kpis .kpi { padding-left: 12px; border-top: 1px solid var(--border-faible); }
+  .fiche-kpis .kpi:nth-child(odd) { border-left: 0; padding-left: 0; }
+  .fiche-kpis .kpi:nth-child(-n+2) { border-top: 0; }
+  .choix-segment .choix-opts { display: flex; flex-direction: column; width: 100%; }
+  .choix-segment .choix-radios { display: flex; flex-direction: column; width: 100%; }
+  .choix-segment .opt, .choix-segment .dash-options-list-option { min-height: 44px; display: flex;
+    width: 100%; }
+  .choix-segment, .choix-segment .opt-txt { width: 100%; }
+  .choix-segment .opt-txt { padding: 12px; text-align: center; }
+  .leg-rampe { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .leg-rampe .leg-case { flex-direction: row; align-items: center; gap: 8px; }
+  .leg-pastille { width: 24px; flex: 0 0 24px; height: 12px; }
+  .tm-menu { grid-template-columns: minmax(0, 1fr); }
+  .tab th, .tab td { padding: 8px 4px; }
+  .comp-ligne { grid-template-columns: minmax(0, 1fr) 40px; }
+  .comp-ligne .comp-lib { grid-column: 1 / -1; }
+  .filtre-large, .filtre-moyen { flex: 1 1 100%; max-width: none; }
+  /* l'action d'export passe en pleine largeur sous les champs, jamais à côté d'un champ coupé */
+  .barre-filtres > .btn-contour, .barre-filtres > .btn-plein { margin-left: 0; width: 100%; }
+  .outils-carte { flex-wrap: wrap; }
+  .eq-grille { grid-template-columns: minmax(0, 1fr); }
+  .eq-photo { width: 64px; height: 64px; }
+}

@@ -1,0 +1,7 @@
+dash
+dash-bootstrap-components
+plotly
+pandas
+psycopg[binary]
+gunicorn
+flask-compress

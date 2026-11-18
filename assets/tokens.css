@@ -1,0 +1,68 @@
+/* Jetons de design — SEUL fichier où une couleur s'écrit en dur. Thème clair uniquement.
+   Les noms reprennent ceux de shadcn/ui en CSS natif : la stack reste Dash + CSS local,
+   sans Tailwind ni build Node, et aucune ressource distante (CSP default-src 'self'). */
+:root {
+  /* ---- Typographie : polices système uniquement, aucune police distante ---- */
+  --police-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --police-chiffre: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  /* ---- 6 tailles, 3 graisses ---- */
+  --t-mini: 12px; --t-petit: 13px; --t-corps: 14px; --t-chapo: 16px; --t-h1: 17px;
+  --t-chiffre: 22px;
+
+  /* ---- Tailles de glyphe : marques, pas du texte (flèche de tendance, puces P1/P2/P3,
+     unité accolée à un chiffre). Relatives à leur contexte, donc hors échelle de texte. ---- */
+  --g-unite: 0.62em; --g-fleche: 0.78em; --g-puce: 8px;
+
+  /* ---- Rayons : 4 pas + none ---- */
+  --radius: 8px; --radius-sm: 4px; --radius-xs: 2px; --radius-full: 999px;
+
+  /* ---- Couleurs ---- */
+  --background: #EDF0F4;
+  --foreground: #16222E;
+  --card: #FFFFFF;
+  --card-foreground: #16222E;
+  --muted: #F3F5F8;
+  --muted-foreground: #53606D;
+  --primary: #1D3F6E;
+  --primary-foreground: #FFFFFF;
+  --primary-doux: #E5ECF5;
+  --primary-region: #A8C3E2;
+  --border: #D8DEE6;
+  --border-faible: #E8ECF1;
+  --bord-fort: #BDC6D1;
+  --ring: #1D3F6E;
+  --destructive: #B42318;
+  --destructive-foreground: #FFFFFF;
+  --statut-pire: #B42318;
+  --statut-mieux: #146C43;
+  --statut-attention: #B45309;
+  --fond-attention: #FDF6EC;
+  --bord-attention: #E7D3B3;
+  --fond-erreur: #FDF3F2;
+  --bord-erreur: #E9C5C1;
+  --survol: #F5F8FC;
+  --piste: #E4E9EF;
+  --piste-pleine: #8D99A6;
+  --trait-region: #46525E;
+  --trait-province: #FFFFFF;
+  --gris-carte: #E4E8ED;
+  --badge-p1-bg: #E5ECF5; --badge-p1-fg: #1D3F6E;
+  --badge-p2-bg: #EEF1F4; --badge-p2-fg: #475562;
+  --badge-p3-bg: #F3F5F8; --badge-p3-fg: #53606D;
+  --squelette: #E6EAEF;
+  /* filet discret des pastilles de légende (une couleur pleine sur fond blanc ne se voit pas) */
+  --bord-pastille: rgba(16, 42, 67, 0.14);
+  /* hachure « carte des écoles peu fiable » : motif de statut, pas une décoration */
+  --hachure: rgba(60, 60, 60, 0.5);
+  /* seule ombre du produit : l'infobulle, seul élément flottant */
+  --ombre-overlay: 0 8px 22px rgba(16, 42, 67, 0.16);
+
+  /* ---- Rampe choroplèthe : une seule teinte (ocre), clair = faible, foncé = fort ---- */
+  --carte-1: #FBEFDA; --carte-2: #F0CD93; --carte-3: #DC9F46;
+  --carte-4: #B36C16; --carte-5: #703802; --carte-nd: #DDE2E8;
+
+  /* ---- Séries de courbes et de barres : encre, ocre foncé, gris — jamais l'accent ---- */
+  --serie-1: #16222E; --serie-2: #B36C16; --serie-3: #53606D;
+}

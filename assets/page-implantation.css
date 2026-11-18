@@ -1,0 +1,19 @@
+/* Implantation (`/implantation`) — règles de mise en page propres à cet écran.
+   Tout le reste vient du kit (assets/style.css) ; aucune couleur ici, uniquement des jetons
+   et des largeurs de champ. */
+
+@media (min-width: 621px) {
+  /* « Sites affichés » : l'option la plus longue (« Tous, y compris à vérifier ») doit tenir
+     dans le champ sans être coupée ; les 200 px de .filtre-moyen n'y suffisent pas à 14 px. */
+  .p-implantation .filtre-sites { flex: 1 1 280px; max-width: 320px; }
+}
+
+/* La CARTE occupe la colonne principale — c'est avec elle qu'on situe un site, et elle y gagne
+   le déplacement et le zoom — et la liste des sites tient dans la colonne de 480-520 px,
+   où ses six colonnes (somme 494 px) restent lisibles sans défilement horizontal dès 1366 px.
+   L'ordre des deux panneaux suit celui de `implantation.py` : la carte est le premier enfant
+   de la rangée, donc la règle du kit `.racine-ecran .rangee > :first-child .zone-carte` lui donne
+   la hauteur restante. */
+@media (min-width: 1181px) {
+  .p-implantation .rangee { grid-template-columns: minmax(0, 1fr) minmax(480px, 520px); }
+}

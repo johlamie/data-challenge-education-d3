@@ -1,0 +1,41 @@
+/* Classement (/classement) — règles de mise en page propres à cette page.
+   Tout le reste vient du kit (assets/style.css), y compris le restylage du DataTable ; ici,
+   aucune couleur, seulement des jetons et des valeurs de l'échelle d'espacement. */
+
+/* Les filtres et l'export vivent dans la barre sans cadre du kit (`.barre-filtres`) :
+   cette page n'a pas de panneau de contrôles à régler. */
+
+/* Le tableau est l'objet principal de cet écran (l'inverse de la Vue d'ensemble) : la carte garde
+   un panneau au bas de la fourchette 380-440 px pour que les 8 colonnes tiennent sans défiler. */
+@media (min-width: 1181px) {
+  .p-classement .rangee { grid-template-columns: minmax(0, 1fr) minmax(380px, 400px); }
+}
+
+/* Le tableau **remplit** son panneau : il est l'objet de l'écran, pas une liste de taille fixe.
+   Le verrou « un écran » du kit laisse `.zone-liste` à sa hauteur naturelle (`flex: 0 1 auto`),
+   ce qui convient au top 10 statique de la Vue d'ensemble ; ici, sans cette règle, le DataTable
+   défile dans son bloc **et** laisse 88 px (mesuré) de blanc sous la ligne « Lecture : » à
+   1440×900.
+   Spécificité (0,3,0) : la règle du kit `.racine-ecran .zone-liste` est (0,2,0) et chargée après
+   cette feuille (ordre alphabétique des assets). */
+@media (min-width: 961px) {
+  .racine-ecran .p-classement .zone-liste { flex: 1 1 auto; min-height: 0; }
+}
+
+/* Filet de sécurité : si les colonnes ne tiennent pas dans le panneau (fenêtre étroite, libellé
+   plus long sur données réelles), le tableau **défile dans son bloc** au lieu d'être coupé.
+   Le `.dash-spreadsheet-inner` du DataTable est livré en `overflow-x: hidden` : sans cette règle,
+   le dépassement est rogné en silence et le conteneur extérieur (`overflow-x: auto`) ne voit
+   rien à faire défiler : la colonne « Région » se retrouve rognée dès 1366 px.
+   L'en-tête figé défile avec le corps : les deux sont dans cet élément. */
+.p-classement .dash-spreadsheet-inner { overflow-x: auto; }
+
+/* L'état vide se place au-dessus du tableau (filtres toujours atteignables) et ne laisse pas
+   d'espace quand il n'y a rien à dire. */
+.p-classement .zone-vide:not(:empty) { margin-bottom: 8px; }
+
+/* Le tableau garde ses 8 colonnes lisibles : sous le rail, il défile dans son bloc, jamais la page. */
+@media (max-width: 960px) {
+  .p-classement .zone-liste { overflow: auto; max-height: 60dvh; }
+  .p-classement .zone-liste .dash-spreadsheet-container { min-width: 720px; }
+}
